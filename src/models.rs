@@ -275,7 +275,7 @@ impl Instruction {
                         Ok(reg) => reg,
                         Err(_) => {
                             let imm: i16 = shamt.parse()?;
-                            if imm < 0 || imm > 15 {
+                            if !(0..=15).contains(&imm) {
                                 bail!("Invalid shift immediate: must be 0-15");
                             }
 
@@ -332,7 +332,7 @@ impl Instruction {
                     let rs = args.next_reg()?;
                     let imm = args.next_imm()?;
 
-                    if imm < -32 || imm > 31 {
+                    if !(-32..=31).contains(&imm) {
                         bail!("Immediate {} out of bounds for 6-bit field", imm);
                     }
 
@@ -344,7 +344,7 @@ impl Instruction {
                     let target = args.next().context("Missing branch target")?;
                     let offset = resolve_branch(target, current_addr)?;
 
-                    if offset < -32 || offset > 31 {
+                    if !(-32..=31).contains(&offset) {
                         bail!("Branch offset {} out of 6-bit range", offset);
                     }
 
@@ -394,7 +394,7 @@ impl Instruction {
                     let target = args.next().context("Missing target")?;
                     let offset = resolve_branch(target, current_addr + 1)?;
 
-                    if offset < -32 || offset > 31 {
+                    if !(-32..=31).contains(&offset) {
                         bail!("Branch offset out of bounds");
                     }
 
@@ -416,7 +416,7 @@ impl Instruction {
                     let target = args.next().context("Missing target")?;
                     let offset = resolve_branch(target, current_addr + 1)?;
 
-                    if offset < -32 || offset > 31 {
+                    if !(-32..=31).contains(&offset) {
                         bail!("Branch offset out of bounds");
                     }
 
@@ -438,7 +438,7 @@ impl Instruction {
                     let target = args.next().context("Missing target")?;
                     let offset = resolve_branch(target, current_addr + 1)?;
 
-                    if offset < -32 || offset > 31 {
+                    if !(-32..=31).contains(&offset) {
                         bail!("Branch offset out of bounds");
                     }
 
@@ -460,7 +460,7 @@ impl Instruction {
                     let target = args.next().context("Missing target")?;
                     let offset = resolve_branch(target, current_addr + 1)?;
 
-                    if offset < -32 || offset > 31 {
+                    if !(-32..=31).contains(&offset) {
                         bail!("Branch offset out of bounds");
                     }
 
@@ -481,7 +481,7 @@ impl Instruction {
                     let target = args.next().context("Missing target")?;
                     let offset = resolve_branch(target, current_addr + 1)?;
 
-                    if offset < -32 || offset > 31 {
+                    if !(-32..=31).contains(&offset) {
                         bail!("Branch offset out of bounds");
                     }
 
@@ -502,7 +502,7 @@ impl Instruction {
                     let target = args.next().context("Missing target")?;
                     let offset = resolve_branch(target, current_addr + 1)?;
 
-                    if offset < -32 || offset > 31 {
+                    if !(-32..=31).contains(&offset) {
                         bail!("Branch offset out of bounds");
                     }
 
@@ -523,7 +523,7 @@ impl Instruction {
                     let target = args.next().context("Missing target")?;
                     let offset = resolve_branch(target, current_addr + 1)?;
 
-                    if offset < -32 || offset > 31 {
+                    if !(-32..=31).contains(&offset) {
                         bail!("Branch offset out of bounds");
                     }
 
@@ -544,7 +544,7 @@ impl Instruction {
                     let target = args.next().context("Missing target")?;
                     let offset = resolve_branch(target, current_addr + 1)?;
 
-                    if offset < -32 || offset > 31 {
+                    if !(-32..=31).contains(&offset) {
                         bail!("Branch offset out of bounds");
                     }
 
