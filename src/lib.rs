@@ -58,7 +58,7 @@ pub fn parse(code: String) -> anyhow::Result<(Vec<u16>, Vec<u16>)> {
                         .0
                         .encode(args, &symbol_table, insts.len() as u16, true)
                         .with_context(|| {
-                            format!("Error encountered at line {}:\n\t{}", real_idx, line)
+                            format!("Error encountered at line {}:\n\t{}\n\n", real_idx, line)
                         })?,
                 );
             }
