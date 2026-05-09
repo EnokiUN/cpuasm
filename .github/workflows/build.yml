@@ -3,12 +3,9 @@ name: Build Binary
 on:
   push:
   pull_request:
-  release:
-    types:
-      - published
 
 concurrency:
-  group: ${{ github.ref }}-${{ github.event_name == 'release' }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -19,51 +16,35 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+
       - name: Install Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
+        uses: dtolnay/rust-toolchain@stable
+
       - name: Cache Rust Dependencies
         uses: Swatinem/rust-cache@v2
         with:
           key: ${{ matrix.os }}
+
       - name: Build
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: --release
-      # Windows scripting isn't the same.
-      - name: Get Variables (Windows)
+        run: cargo build --release
+
+      - name: Set OS-specific Variables
+        shell: bash
         run: |
-          echo "$env:GITHUB_ENV"
-          echo ("TAG=" + $env:GITHUB_REF.replace('refs/tags/', '')) >> $env:GITHUB_ENV
-          echo "PATH=cpuasm.exe" >> $env:GITHUB_ENV
-          echo "OS=Windows" >> $env:GITHUB_ENV
-        if: matrix.os == 'windows-latest'
-      - name: Get Variables (MacOS)
-        run: |
-          echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
-          echo "PATH=cpuasm" >> $GITHUB_ENV
-          echo "OS=MacOS" >> $GITHUB_ENV
-        if: matrix.os == 'macos-latest'
-      - name: Get Variables (Linux)
-        run: |
-          echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
-          echo "PATH=cpuasm" >> $GITHUB_ENV
-          echo "OS=Linux-GNU" >> $GITHUB_ENV
-        if: matrix.os == 'ubuntu-latest'
+          if [ "${{ matrix.os }}" = "windows-latest" ]; then
+            echo "OS_NAME=Windows" >> $GITHUB_ENV
+            echo "BIN_NAME=cpuasm.exe" >> $GITHUB_ENV
+          elif [ "${{ matrix.os }}" = "macos-latest" ]; then
+            echo "OS_NAME=MacOS" >> $GITHUB_ENV
+            echo "BIN_NAME=cpuasm" >> $GITHUB_ENV
+          else
+            echo "OS_NAME=Linux-GNU" >> $GITHUB_ENV
+            echo "BIN_NAME=cpuasm" >> $GITHUB_ENV
+          fi
+
       - name: Upload Binary
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.OS }}-cpuasm
-          path: target/release/${{ env.PATH }}
-      - name: Update Release
-        if: github.event_name == 'release'
-        uses: svenstaro/upload-release-action@v2
-        with:
-          file: target/release/${{ env.PATH }}
-          tag: ${{ github.ref }}
-          overwrite: true
-          asset_name: cpuasm-${{ env.TAG }}-${{ env.OS }}-x86_64
+          name: cpuasm-${{ env.OS_NAME }}
+          path: target/release/${{ env.PATH_NAME }}
