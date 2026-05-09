@@ -4,9 +4,9 @@ pub mod models;
 use std::collections::HashMap;
 
 use anyhow::{Context, bail};
-pub use models::*;
+use models::*;
 
-pub enum ParseState {
+enum ParseState {
     Text,
     Data,
 }
